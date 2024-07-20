@@ -1,6 +1,8 @@
-import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
+import globals from "globals";
+
 import typescriptESLintParser from "@typescript-eslint/parser";
 
+import eslintConfigPrettier from "eslint-config-prettier";
 import reactRefresh from "react-refresh";
 import eslint from "@eslint/js";
 import prettier from "prettier";
@@ -12,6 +14,9 @@ export default [
   },
   {
     languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
       ecmaVersion: 2020,
       parser: typescriptESLintParser,
     },
@@ -21,7 +26,6 @@ export default [
     plugins: {
       "react-refresh": reactRefresh,
       prettier,
-      eslintPluginPrettierRecommended,
     },
   },
   {
@@ -37,4 +41,5 @@ export default [
       ],
     },
   },
+  eslintConfigPrettier,
 ];

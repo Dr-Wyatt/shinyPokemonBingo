@@ -1,0 +1,5 @@
+.pnp.*
+.vscode
+.yarn
+dist
+.prettierrc.json
