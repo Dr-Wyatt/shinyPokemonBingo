@@ -6,6 +6,10 @@ import {
   Button,
   FormLabel,
   Box,
+  Dropdown,
+  MenuButton,
+  Menu,
+  MenuItem,
 } from "@mui/joy";
 import React, { useCallback, useRef, useState } from "react";
 import { AddPokemonModal } from "./AddPokemonModal";
@@ -117,13 +121,10 @@ export function BingoBoard(): React.JSX.Element {
   );
 
   const handleExport = useCallback(
-    async (
-      _event: React.SyntheticEvent | null,
-      downloadType: string | null,
-    ) => {
+    (fileType: string | null) => async () => {
       const element = exportRef.current;
 
-      const fileEnding = downloadType ?? "png";
+      const fileEnding = fileType ?? "png";
 
       if (element) {
         const canvas = await html2canvas(element);
@@ -213,10 +214,13 @@ export function BingoBoard(): React.JSX.Element {
         ))}
       </Box>
 
-      <Select size={"lg"} placeholder={"Export as..."} onChange={handleExport}>
-        <Option value={"png"}>PNG</Option>
-        <Option value={"jpg"}>JPG</Option>
-      </Select>
+      <Dropdown>
+        <MenuButton size={"lg"}>Export as...</MenuButton>
+        <Menu>
+          <MenuItem onClick={handleExport("png")}>PNG</MenuItem>
+          <MenuItem onClick={handleExport("jpg")}>JPG</MenuItem>
+        </Menu>
+      </Dropdown>
       <AddPokemonModal
         square={selectedSquare}
         open={openAddModal}
