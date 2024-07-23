@@ -10,7 +10,7 @@ import prettier from "prettier";
 export default [
   eslint.configs.recommended,
   {
-    files: ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"],
+    files: ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
   },
   {
     languageOptions: {
