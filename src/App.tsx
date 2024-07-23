@@ -1,8 +1,12 @@
+import { Stack, Typography } from "@mui/joy";
+import { BingoBoard } from "./BingoBoard";
+
 function App() {
   return (
-    <>
-      <h1>Shiny Pokemon Bingo</h1>
-    </>
+    <Stack alignItems={"center"} spacing={1}>
+      <Typography level={"h1"}>Shiny Pokemon Bingo</Typography>
+      <BingoBoard />
+    </Stack>
   );
 }
 
