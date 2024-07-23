@@ -39,8 +39,6 @@ function getMinWidth(numberOfRows: number): number {
   switch (numberOfRows) {
     case 3:
       return 120;
-    case 4:
-      return 90;
     case 5:
       return 75;
     default:
