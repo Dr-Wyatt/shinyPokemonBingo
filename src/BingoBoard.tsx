@@ -7,9 +7,10 @@ import {
   FormLabel,
   Box,
 } from "@mui/joy";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { AddPokemonModal } from "./AddPokemonModal";
 import { EditPokemonModal } from "./EditPokemonModal";
+import html2canvas from "html2canvas";
 
 export interface BingoSquare {
   id: string;
@@ -57,6 +58,7 @@ function getBackGroundColor(status: BingoSquare["status"]): string | undefined {
 }
 
 export function BingoBoard(): React.JSX.Element {
+  const exportRef = useRef();
   const [numberOfRows, setNumberOfRows] = useState<number>(3);
   const [bingoBoard, setBingoBoard] = useState(createBingoBoard(numberOfRows));
 
@@ -114,6 +116,36 @@ export function BingoBoard(): React.JSX.Element {
     [],
   );
 
+  const handleExport = useCallback(
+    async (
+      _event: React.SyntheticEvent | null,
+      downloadType: string | null,
+    ) => {
+      const element = exportRef.current;
+
+      const fileEnding = downloadType ?? "png";
+
+      if (element) {
+        const canvas = await html2canvas(element);
+
+        const data = canvas.toDataURL(`image/${fileEnding}`);
+        const link = document.createElement("a");
+
+        if (typeof link.download === "string") {
+          link.href = data;
+          link.download = `image.${fileEnding}`;
+
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          window.open(data);
+        }
+      }
+    },
+    [exportRef],
+  );
+
   return (
     <Stack spacing={1} alignItems={"center"}>
       <FormLabel
@@ -139,7 +171,7 @@ export function BingoBoard(): React.JSX.Element {
         <Option value={5}>5</Option>
       </Select>
 
-      <Box>
+      <Box ref={exportRef}>
         {bingoBoard.map((row, rowIndex) => (
           <Stack key={`row-${rowIndex}`} direction={"row"}>
             {row.map((bingoSquare, index) => (
@@ -181,9 +213,10 @@ export function BingoBoard(): React.JSX.Element {
         ))}
       </Box>
 
-      <Button size="sm" variant="solid">
-        Save
-      </Button>
+      <Select size={"lg"} placeholder={"Export as..."} onChange={handleExport}>
+        <Option value={"png"}>PNG</Option>
+        <Option value={"jpg"}>JPG</Option>
+      </Select>
       <AddPokemonModal
         square={selectedSquare}
         open={openAddModal}

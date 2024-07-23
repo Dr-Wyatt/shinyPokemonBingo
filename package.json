@@ -15,6 +15,7 @@
     "@emotion/styled": "^11.13.0",
     "@fontsource/inter": "^5.0.19",
     "@mui/joy": "5.0.0-beta.48",
+    "html2canvas": "^1.4.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
