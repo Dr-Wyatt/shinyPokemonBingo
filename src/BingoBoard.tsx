@@ -54,7 +54,7 @@ interface ModalProps {
 }
 
 function AddPokemonModal(props: ModalProps): React.JSX.Element {
-  const { square, open, setOpen: handleClose, addPokemon } = props;
+  const { square, open, setOpen, addPokemon } = props;
 
   const handleAddPokemon = useCallback(() => {
     if (square) {
@@ -63,8 +63,12 @@ function AddPokemonModal(props: ModalProps): React.JSX.Element {
         path: "this is a test",
       });
     }
-    handleClose(false);
+    setOpen(false);
   }, [square]);
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
 
   return (
     <Modal
