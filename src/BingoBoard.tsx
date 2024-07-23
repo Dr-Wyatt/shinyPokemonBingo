@@ -1,5 +1,4 @@
 import {
-  AspectRatio,
   Select,
   Stack,
   Option,
@@ -15,6 +14,7 @@ import React, { useCallback, useRef, useState } from "react";
 import { AddPokemonModal } from "./AddPokemonModal";
 import { EditPokemonModal } from "./EditPokemonModal";
 import html2canvas from "html2canvas";
+import { BingoSquareWrapper } from "./BingoSquareWrapper";
 
 export interface BingoSquare {
   id: string;
@@ -22,7 +22,7 @@ export interface BingoSquare {
   path?: string;
 }
 
-type BingoBoardType = Array<Array<BingoSquare>>;
+export type BingoBoardType = Array<Array<BingoSquare>>;
 
 function createBingoBoard(numberOfRows: number): BingoBoardType {
   return Array.from({ length: numberOfRows }).map((_value, rowIndex) =>
@@ -35,34 +35,13 @@ function createBingoBoard(numberOfRows: number): BingoBoardType {
   );
 }
 
-function getMinWidth(numberOfRows: number): number {
-  switch (numberOfRows) {
-    case 3:
-      return 120;
-    case 5:
-      return 75;
-    default:
-      return 100;
-  }
-}
-
-function getBackGroundColor(status: BingoSquare["status"]): string | undefined {
-  switch (status) {
-    case "found":
-      return "lightGreen";
-    case "hunting":
-      return "orange";
-    case "not_found":
-      return undefined;
-    default:
-      return undefined;
-  }
-}
-
 export function BingoBoard(): React.JSX.Element {
   const exportRef = useRef();
-  const [numberOfRows, setNumberOfRows] = useState<number>(3);
-  const [bingoBoard, setBingoBoard] = useState(createBingoBoard(numberOfRows));
+
+  const [bingoBoard, setBingoBoard] = useState<BingoBoardType>(
+    createBingoBoard(3),
+  );
+  const [numberOfRows, setNumberOfRows] = useState<number>(bingoBoard.length);
 
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [openEditModal, setOpenEditModal] = useState<boolean>(false);
@@ -102,18 +81,15 @@ export function BingoBoard(): React.JSX.Element {
     [bingoBoard],
   );
 
-  const handleAddOnClick = useCallback(
-    (square: BingoSquare) => () => {
+  const handleOnClick = useCallback(
+    (square: BingoSquare, type: "add" | "edit") => () => {
       setSelectedSquare(square);
-      setOpenAddModal(true);
-    },
-    [],
-  );
 
-  const handleEditOnClick = useCallback(
-    (square: BingoSquare) => () => {
-      setSelectedSquare(square);
-      setOpenEditModal(true);
+      if (type === "add") {
+        setOpenAddModal(true);
+      } else if (type === "edit") {
+        setOpenEditModal(true);
+      }
     },
     [],
   );
@@ -166,7 +142,6 @@ export function BingoBoard(): React.JSX.Element {
         value={numberOfRows}
       >
         <Option value={3}>3</Option>
-        <Option value={4}>4</Option>
         <Option value={5}>5</Option>
       </Select>
 
@@ -174,23 +149,20 @@ export function BingoBoard(): React.JSX.Element {
         {bingoBoard.map((row, rowIndex) => (
           <Stack key={`row-${rowIndex}`} direction={"row"}>
             {row.map((bingoSquare, index) => (
-              <AspectRatio
-                id={bingoSquare.id}
-                key={`${rowIndex}-${index}`}
-                ratio={"1/1"}
-                variant="outlined"
-                sx={{
-                  minWidth: getMinWidth(bingoBoard.length),
-                  backgroundColor: getBackGroundColor(bingoSquare.status),
-                }}
+              <BingoSquareWrapper
+                bingoBoard={bingoBoard}
+                bingoSquare={bingoSquare}
               >
-                {bingoSquare.path ? (
+                {(bingoBoard.length === 3 && bingoSquare.id === "1-1") ||
+                (bingoBoard.length === 5 && bingoSquare.id === "2-2") ? (
+                  <Box>Bonus</Box>
+                ) : bingoSquare.path ? (
                   <Button
                     key={`${rowIndex}-${index}-edit-button`}
                     sx={{ border: "none", "&:hover": { borderRadius: 0 } }}
                     color="neutral"
                     variant="outlined"
-                    onClick={handleEditOnClick(bingoSquare)}
+                    onClick={handleOnClick(bingoSquare, "edit")}
                   >
                     {bingoSquare.path}
                     {bingoSquare.status}
@@ -201,12 +173,12 @@ export function BingoBoard(): React.JSX.Element {
                     sx={{ border: "none", "&:hover": { borderRadius: 0 } }}
                     color="neutral"
                     variant="outlined"
-                    onClick={handleAddOnClick(bingoSquare)}
+                    onClick={handleOnClick(bingoSquare, "add")}
                   >
                     Add your Pokemon!
                   </Button>
                 )}
-              </AspectRatio>
+              </BingoSquareWrapper>
             ))}
           </Stack>
         ))}
