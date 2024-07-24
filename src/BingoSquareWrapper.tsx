@@ -1,51 +1,25 @@
 import { AspectRatio } from "@mui/joy";
-import { BingoBoardType, BingoSquare } from "./BingoBoard";
+import { BingoSquare } from "./BingoBoard";
 
 import React, { PropsWithChildren } from "react";
-
-function getMinWidth(numberOfRows: number): number {
-  switch (numberOfRows) {
-    case 3:
-      return 120;
-    case 5:
-      return 75;
-    default:
-      return 100;
-  }
-}
-
-function getBackGroundColor(status: BingoSquare["status"]): string | undefined {
-  switch (status) {
-    case "found":
-      return "lightGreen";
-    case "hunting":
-      return "orange";
-    case "not_found":
-      return undefined;
-    default:
-      return undefined;
-  }
-}
+import { SxProps } from "@mui/joy/styles/types";
 
 interface Props {
-  bingoSquare: BingoSquare;
-  bingoBoard: BingoBoardType;
+  bingoSquareID: BingoSquare["id"];
+  sx?: SxProps;
 }
 
 export function BingoSquareWrapper(
   props: PropsWithChildren<Props>,
 ): React.JSX.Element {
-  const { bingoSquare, bingoBoard, children } = props;
+  const { bingoSquareID, sx, children } = props;
   return (
     <AspectRatio
-      id={bingoSquare.id}
-      key={bingoSquare.id}
+      id={bingoSquareID}
+      key={bingoSquareID}
       ratio={"1/1"}
       variant="outlined"
-      sx={{
-        minWidth: getMinWidth(bingoBoard.length),
-        backgroundColor: getBackGroundColor(bingoSquare.status),
-      }}
+      sx={sx}
     >
       {children}
     </AspectRatio>

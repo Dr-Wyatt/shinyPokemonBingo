@@ -9,6 +9,7 @@ import {
   MenuButton,
   Menu,
   MenuItem,
+  Typography,
 } from "@mui/joy";
 import React, { useCallback, useRef, useState } from "react";
 import { AddPokemonModal } from "./AddPokemonModal";
@@ -34,12 +35,35 @@ function createBingoBoard(numberOfRows: number): BingoBoardType {
     }),
   );
 }
+function getMinWidth(numberOfRows: number): number {
+  switch (numberOfRows) {
+    case 3:
+      return 120;
+    case 5:
+      return 75;
+    default:
+      return 120;
+  }
+}
+
+function getBackGroundColor(status: BingoSquare["status"]): string | undefined {
+  switch (status) {
+    case "found":
+      return "lightGreen";
+    case "hunting":
+      return "orange";
+    case "not_found":
+      return undefined;
+    default:
+      return undefined;
+  }
+}
 
 export function BingoBoard(): React.JSX.Element {
   const exportRef = useRef();
 
   const [bingoBoard, setBingoBoard] = useState<BingoBoardType>(
-    createBingoBoard(3),
+    createBingoBoard(5),
   );
   const [numberOfRows, setNumberOfRows] = useState<number>(bingoBoard.length);
 
@@ -94,6 +118,10 @@ export function BingoBoard(): React.JSX.Element {
     [],
   );
 
+  const handleReset = useCallback(() => {
+    setBingoBoard(createBingoBoard(numberOfRows));
+  }, [numberOfRows]);
+
   const handleExport = useCallback(
     (fileType: string | null) => async () => {
       const element = exportRef.current;
@@ -137,7 +165,7 @@ export function BingoBoard(): React.JSX.Element {
               "select-number-of-rows-label select-number-of-rows",
           },
         }}
-        defaultValue={3}
+        defaultValue={5}
         onChange={handleNumberOfBoxes}
         value={numberOfRows}
       >
@@ -146,16 +174,31 @@ export function BingoBoard(): React.JSX.Element {
       </Select>
 
       <Box ref={exportRef}>
+        <Stack direction={"row"}>
+          {Array.from("SHINY").map((value, index) => (
+            <BingoSquareWrapper
+              bingoSquareID={`${value}-${index}`}
+              sx={{ minWidth: bingoBoard.length === 3 ? 72 : 75 }}
+            >
+              <Typography level="h1" color="primary">
+                {value}
+              </Typography>
+            </BingoSquareWrapper>
+          ))}
+        </Stack>
         {bingoBoard.map((row, rowIndex) => (
           <Stack key={`row-${rowIndex}`} direction={"row"}>
             {row.map((bingoSquare, index) => (
               <BingoSquareWrapper
-                bingoBoard={bingoBoard}
-                bingoSquare={bingoSquare}
+                bingoSquareID={bingoSquare.id}
+                sx={{
+                  minWidth: getMinWidth(bingoBoard.length),
+                  backgroundColor: getBackGroundColor(bingoSquare.status),
+                }}
               >
                 {(bingoBoard.length === 3 && bingoSquare.id === "1-1") ||
                 (bingoBoard.length === 5 && bingoSquare.id === "2-2") ? (
-                  <Box>Bonus</Box>
+                  <Box sx={{ backgroundColor: "lightGreen" }}>Bonus</Box>
                 ) : bingoSquare.path ? (
                   <Button
                     key={`${rowIndex}-${index}-edit-button`}
@@ -184,13 +227,23 @@ export function BingoBoard(): React.JSX.Element {
         ))}
       </Box>
 
-      <Dropdown>
-        <MenuButton size={"lg"}>Export as...</MenuButton>
-        <Menu>
-          <MenuItem onClick={handleExport("png")}>PNG</MenuItem>
-          <MenuItem onClick={handleExport("jpg")}>JPG</MenuItem>
-        </Menu>
-      </Dropdown>
+      <Stack direction={"row"} spacing={2}>
+        <Button
+          color="danger"
+          variant="outlined"
+          size={"lg"}
+          onClick={handleReset}
+        >
+          Reset
+        </Button>
+        <Dropdown>
+          <MenuButton size={"lg"}>Export as...</MenuButton>
+          <Menu>
+            <MenuItem onClick={handleExport("png")}>PNG</MenuItem>
+            <MenuItem onClick={handleExport("jpg")}>JPG</MenuItem>
+          </Menu>
+        </Dropdown>
+      </Stack>
       <AddPokemonModal
         square={selectedSquare}
         open={openAddModal}
