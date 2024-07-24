@@ -1,16 +1,21 @@
 import {
-  AspectRatio,
   Select,
   Stack,
   Option,
   Button,
   FormLabel,
   Box,
+  Dropdown,
+  MenuButton,
+  Menu,
+  MenuItem,
+  Typography,
 } from "@mui/joy";
 import React, { useCallback, useRef, useState } from "react";
 import { AddPokemonModal } from "./AddPokemonModal";
 import { EditPokemonModal } from "./EditPokemonModal";
 import html2canvas from "html2canvas";
+import { BingoSquareWrapper } from "./BingoSquareWrapper";
 
 export interface BingoSquare {
   id: string;
@@ -18,7 +23,7 @@ export interface BingoSquare {
   path?: string;
 }
 
-type BingoBoardType = Array<Array<BingoSquare>>;
+export type BingoBoardType = Array<Array<BingoSquare>>;
 
 function createBingoBoard(numberOfRows: number): BingoBoardType {
   return Array.from({ length: numberOfRows }).map((_value, rowIndex) =>
@@ -30,17 +35,14 @@ function createBingoBoard(numberOfRows: number): BingoBoardType {
     }),
   );
 }
-
 function getMinWidth(numberOfRows: number): number {
   switch (numberOfRows) {
     case 3:
       return 120;
-    case 4:
-      return 90;
     case 5:
       return 75;
     default:
-      return 100;
+      return 120;
   }
 }
 
@@ -59,8 +61,11 @@ function getBackGroundColor(status: BingoSquare["status"]): string | undefined {
 
 export function BingoBoard(): React.JSX.Element {
   const exportRef = useRef();
-  const [numberOfRows, setNumberOfRows] = useState<number>(3);
-  const [bingoBoard, setBingoBoard] = useState(createBingoBoard(numberOfRows));
+
+  const [bingoBoard, setBingoBoard] = useState<BingoBoardType>(
+    createBingoBoard(5),
+  );
+  const [numberOfRows, setNumberOfRows] = useState<number>(bingoBoard.length);
 
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [openEditModal, setOpenEditModal] = useState<boolean>(false);
@@ -100,30 +105,28 @@ export function BingoBoard(): React.JSX.Element {
     [bingoBoard],
   );
 
-  const handleAddOnClick = useCallback(
-    (square: BingoSquare) => () => {
+  const handleOnClick = useCallback(
+    (square: BingoSquare, type: "add" | "edit") => () => {
       setSelectedSquare(square);
-      setOpenAddModal(true);
+
+      if (type === "add") {
+        setOpenAddModal(true);
+      } else if (type === "edit") {
+        setOpenEditModal(true);
+      }
     },
     [],
   );
 
-  const handleEditOnClick = useCallback(
-    (square: BingoSquare) => () => {
-      setSelectedSquare(square);
-      setOpenEditModal(true);
-    },
-    [],
-  );
+  const handleReset = useCallback(() => {
+    setBingoBoard(createBingoBoard(numberOfRows));
+  }, [numberOfRows]);
 
   const handleExport = useCallback(
-    async (
-      _event: React.SyntheticEvent | null,
-      downloadType: string | null,
-    ) => {
+    (fileType: string | null) => async () => {
       const element = exportRef.current;
 
-      const fileEnding = downloadType ?? "png";
+      const fileEnding = fileType ?? "png";
 
       if (element) {
         const canvas = await html2canvas(element);
@@ -162,36 +165,47 @@ export function BingoBoard(): React.JSX.Element {
               "select-number-of-rows-label select-number-of-rows",
           },
         }}
-        defaultValue={3}
+        defaultValue={5}
         onChange={handleNumberOfBoxes}
         value={numberOfRows}
       >
         <Option value={3}>3</Option>
-        <Option value={4}>4</Option>
         <Option value={5}>5</Option>
       </Select>
 
       <Box ref={exportRef}>
+        <Stack direction={"row"}>
+          {Array.from("SHINY").map((value, index) => (
+            <BingoSquareWrapper
+              bingoSquareID={`${value}-${index}`}
+              sx={{ minWidth: bingoBoard.length === 3 ? 72 : 75 }}
+            >
+              <Typography level="h1" color="primary">
+                {value}
+              </Typography>
+            </BingoSquareWrapper>
+          ))}
+        </Stack>
         {bingoBoard.map((row, rowIndex) => (
           <Stack key={`row-${rowIndex}`} direction={"row"}>
             {row.map((bingoSquare, index) => (
-              <AspectRatio
-                id={bingoSquare.id}
-                key={`${rowIndex}-${index}`}
-                ratio={"1/1"}
-                variant="outlined"
+              <BingoSquareWrapper
+                bingoSquareID={bingoSquare.id}
                 sx={{
                   minWidth: getMinWidth(bingoBoard.length),
                   backgroundColor: getBackGroundColor(bingoSquare.status),
                 }}
               >
-                {bingoSquare.path ? (
+                {(bingoBoard.length === 3 && bingoSquare.id === "1-1") ||
+                (bingoBoard.length === 5 && bingoSquare.id === "2-2") ? (
+                  <Box sx={{ backgroundColor: "lightGreen" }}>Bonus</Box>
+                ) : bingoSquare.path ? (
                   <Button
                     key={`${rowIndex}-${index}-edit-button`}
                     sx={{ border: "none", "&:hover": { borderRadius: 0 } }}
                     color="neutral"
                     variant="outlined"
-                    onClick={handleEditOnClick(bingoSquare)}
+                    onClick={handleOnClick(bingoSquare, "edit")}
                   >
                     {bingoSquare.path}
                     {bingoSquare.status}
@@ -202,21 +216,34 @@ export function BingoBoard(): React.JSX.Element {
                     sx={{ border: "none", "&:hover": { borderRadius: 0 } }}
                     color="neutral"
                     variant="outlined"
-                    onClick={handleAddOnClick(bingoSquare)}
+                    onClick={handleOnClick(bingoSquare, "add")}
                   >
                     Add your Pokemon!
                   </Button>
                 )}
-              </AspectRatio>
+              </BingoSquareWrapper>
             ))}
           </Stack>
         ))}
       </Box>
 
-      <Select size={"lg"} placeholder={"Export as..."} onChange={handleExport}>
-        <Option value={"png"}>PNG</Option>
-        <Option value={"jpg"}>JPG</Option>
-      </Select>
+      <Stack direction={"row"} spacing={2}>
+        <Button
+          color="danger"
+          variant="outlined"
+          size={"lg"}
+          onClick={handleReset}
+        >
+          Reset
+        </Button>
+        <Dropdown>
+          <MenuButton size={"lg"}>Export as...</MenuButton>
+          <Menu>
+            <MenuItem onClick={handleExport("png")}>PNG</MenuItem>
+            <MenuItem onClick={handleExport("jpg")}>JPG</MenuItem>
+          </Menu>
+        </Dropdown>
+      </Stack>
       <AddPokemonModal
         square={selectedSquare}
         open={openAddModal}
