@@ -4,11 +4,18 @@ import {
   DialogTitle,
   DialogContent,
   Button,
+  Autocomplete,
 } from "@mui/joy";
 import { BingoSquare } from "./BingoBoard";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
+import { BasicPokemon } from "./api/pokeapi/client";
+
+function getOptionLabel(option: BasicPokemon): string {
+  return option.name.charAt(0).toUpperCase() + option.name.slice(1);
+}
 
 interface ModalProps {
+  listOfPokemon: BasicPokemon[] | undefined;
   square: BingoSquare | undefined;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -21,20 +28,43 @@ interface ModalProps {
 }
 
 export function AddPokemonModal(props: ModalProps): React.JSX.Element {
-  const { square, open, setOpen, addPokemon } = props;
+  const { square, open, setOpen, addPokemon, listOfPokemon } = props;
+
+  const [selectedPokemon, setSelectedPokemon] = useState<BasicPokemon | null>(
+    null,
+  );
+  const [searchTerm, setSearchTerm] = useState<string | undefined>("");
+
+  const handleSearchChange = useCallback(
+    (_event: React.SyntheticEvent, newSelectedPokemon: BasicPokemon | null) => {
+      if (newSelectedPokemon) {
+        setSelectedPokemon(newSelectedPokemon);
+      }
+    },
+    [],
+  );
+
+  const handleSearchInputChange = useCallback(
+    (_event: React.SyntheticEvent, newSearchTerm: string) => {
+      setSearchTerm(newSearchTerm);
+    },
+    [],
+  );
 
   const handleAddPokemon = useCallback(() => {
     if (square) {
       addPokemon(
         {
           ...square,
-          path: "this is a test",
+          path: selectedPokemon?.name,
         },
         "add",
       );
     }
     setOpen(false);
-  }, [square]);
+    setSelectedPokemon(null);
+    setSearchTerm("");
+  }, [square, selectedPokemon]);
 
   const handleClose = useCallback(() => {
     setOpen(false);
@@ -47,8 +77,19 @@ export function AddPokemonModal(props: ModalProps): React.JSX.Element {
       sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
     >
       <ModalDialog>
-        <DialogTitle>Testing Modal</DialogTitle>
+        <DialogTitle>Add Pokemon</DialogTitle>
         <DialogContent>Square ID: {square?.id}</DialogContent>
+
+        <Autocomplete
+          autoComplete
+          getOptionLabel={getOptionLabel}
+          options={listOfPokemon ?? []}
+          placeholder={"Search for a Pokemon!"}
+          value={selectedPokemon}
+          onChange={handleSearchChange}
+          inputValue={searchTerm}
+          onInputChange={handleSearchInputChange}
+        />
         <Button onClick={handleAddPokemon}>Add Pokemon</Button>
       </ModalDialog>
     </Modal>

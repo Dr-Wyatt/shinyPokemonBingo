@@ -14,13 +14,7 @@ export function BingoSquareWrapper(
 ): React.JSX.Element {
   const { bingoSquareID, sx, children } = props;
   return (
-    <AspectRatio
-      id={bingoSquareID}
-      key={bingoSquareID}
-      ratio={"1/1"}
-      variant="outlined"
-      sx={sx}
-    >
+    <AspectRatio id={bingoSquareID} ratio={"1/1"} variant="outlined" sx={sx}>
       {children}
     </AspectRatio>
   );

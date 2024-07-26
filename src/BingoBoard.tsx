@@ -17,6 +17,9 @@ import { EditPokemonModal } from "./EditPokemonModal";
 import html2canvas from "html2canvas";
 import { BingoSquareWrapper } from "./BingoSquareWrapper";
 
+import { useQuery } from "@tanstack/react-query";
+import { PokeApiClient } from "./api/pokeapi/client";
+
 export interface BingoSquare {
   id: string;
   status: "not_found" | "found" | "hunting";
@@ -72,6 +75,13 @@ export function BingoBoard(): React.JSX.Element {
   const [selectedSquare, setSelectedSquare] = useState<
     BingoSquare | undefined
   >();
+
+  const query = useQuery({
+    queryKey: ["allPokemon"],
+    queryFn: () => PokeApiClient.getAllPokemon(),
+  });
+
+  console.log("this is query.data.results", query.data?.results);
 
   const handleNumberOfBoxes = useCallback(
     (_event: React.SyntheticEvent | null, newValue: number | null) => {
@@ -177,6 +187,7 @@ export function BingoBoard(): React.JSX.Element {
         <Stack direction={"row"}>
           {Array.from("SHINY").map((value, index) => (
             <BingoSquareWrapper
+              key={value}
               bingoSquareID={`${value}-${index}`}
               sx={{ minWidth: bingoBoard.length === 3 ? 72 : 75 }}
             >
@@ -190,6 +201,7 @@ export function BingoBoard(): React.JSX.Element {
           <Stack key={`row-${rowIndex}`} direction={"row"}>
             {row.map((bingoSquare, index) => (
               <BingoSquareWrapper
+                key={bingoSquare.id}
                 bingoSquareID={bingoSquare.id}
                 sx={{
                   minWidth: getMinWidth(bingoBoard.length),
@@ -249,6 +261,7 @@ export function BingoBoard(): React.JSX.Element {
         open={openAddModal}
         setOpen={setOpenAddModal}
         addPokemon={handlePokemon}
+        listOfPokemon={query.data?.results}
       />
       <EditPokemonModal
         square={selectedSquare}
