@@ -23,7 +23,9 @@ import { PokeApiClient } from "./api/pokeapi/client";
 export interface BingoSquare {
   id: string;
   status: "not_found" | "found" | "hunting";
+  name?: string;
   path?: string;
+  game?: string;
 }
 
 export type BingoBoardType = Array<Array<BingoSquare>>;
@@ -80,8 +82,6 @@ export function BingoBoard(): React.JSX.Element {
     queryKey: ["allPokemon"],
     queryFn: () => PokeApiClient.getAllPokemon(),
   });
-
-  console.log("this is query.data.results", query.data?.results);
 
   const handleNumberOfBoxes = useCallback(
     (_event: React.SyntheticEvent | null, newValue: number | null) => {
@@ -219,8 +219,13 @@ export function BingoBoard(): React.JSX.Element {
                     variant="outlined"
                     onClick={handleOnClick(bingoSquare, "edit")}
                   >
-                    {bingoSquare.path}
-                    {bingoSquare.status}
+                    <Box>
+                      <img
+                        src={bingoSquare?.path}
+                        max-width="75px"
+                        max-height="75px"
+                      />
+                    </Box>
                   </Button>
                 ) : (
                   <Button
