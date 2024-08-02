@@ -6,6 +6,7 @@ import eslintConfigPrettier from "eslint-config-prettier";
 import reactRefresh from "react-refresh";
 import eslint from "@eslint/js";
 import prettier from "prettier";
+import pluginQuery from "@tanstack/eslint-plugin-query";
 
 export default [
   eslint.configs.recommended,
@@ -26,6 +27,7 @@ export default [
     plugins: {
       "react-refresh": reactRefresh,
       prettier,
+      pluginQuery,
     },
   },
   {

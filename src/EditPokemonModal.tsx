@@ -1,10 +1,11 @@
 import {
   Modal,
   ModalDialog,
-  DialogTitle,
   DialogContent,
   Button,
   ButtonGroup,
+  Stack,
+  Typography,
 } from "@mui/joy";
 import { BingoSquare } from "./BingoBoard";
 import React, { useCallback } from "react";
@@ -56,14 +57,24 @@ export function EditPokemonModal(props: ModalProps): React.JSX.Element {
       sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
     >
       <ModalDialog>
-        <DialogTitle>Testing Modal</DialogTitle>
+        <Stack
+          direction={"row"}
+          spacing={8}
+          justifyContent={"space-between"}
+          alignItems={"center"}
+        >
+          <Typography level={"title-md"}>{square?.name}</Typography>
+          <Typography level={"title-sm"}>{square?.game}</Typography>
+        </Stack>
         <DialogContent>
-          <Button onClick={handleChangePokemon}>Change Pokemon</Button>
-          <ButtonGroup variant="soft" aria-label="soft button group">
-            <Button onClick={handleEditStatus("not_found")}>Not Found</Button>
-            <Button onClick={handleEditStatus("found")}>Found</Button>
-            <Button onClick={handleEditStatus("hunting")}>Hunting</Button>
-          </ButtonGroup>
+          <Stack spacing={2}>
+            <Button onClick={handleChangePokemon}>Change Pokemon</Button>
+            <ButtonGroup variant="soft" aria-label="soft button group">
+              <Button onClick={handleEditStatus("not_found")}>Not Found</Button>
+              <Button onClick={handleEditStatus("found")}>Found</Button>
+              <Button onClick={handleEditStatus("hunting")}>Hunting</Button>
+            </ButtonGroup>
+          </Stack>
         </DialogContent>
       </ModalDialog>
     </Modal>
