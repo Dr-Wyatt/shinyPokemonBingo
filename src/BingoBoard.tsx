@@ -160,121 +160,123 @@ export function BingoBoard(): React.JSX.Element {
   );
 
   return (
-    <Stack spacing={1} alignItems={"center"}>
-      <FormLabel
-        htmlFor="select-number-of-rows"
-        id="select-number-of-rows-label"
-      >
-        Select your number of rows and columns
-      </FormLabel>
-      <Select
-        slotProps={{
-          button: {
-            id: "select-number-of-rows",
-            "aria-labelledby":
-              "select-number-of-rows-label select-number-of-rows",
-          },
-        }}
-        defaultValue={5}
-        onChange={handleNumberOfBoxes}
-        value={numberOfRows}
-      >
-        <Option value={3}>3</Option>
-        <Option value={5}>5</Option>
-      </Select>
+    <Stack>
+      <Stack spacing={1} alignItems={"center"}>
+        <FormLabel
+          htmlFor="select-number-of-rows"
+          id="select-number-of-rows-label"
+        >
+          Select your number of rows and columns
+        </FormLabel>
+        <Select
+          slotProps={{
+            button: {
+              id: "select-number-of-rows",
+              "aria-labelledby":
+                "select-number-of-rows-label select-number-of-rows",
+            },
+          }}
+          defaultValue={5}
+          onChange={handleNumberOfBoxes}
+          value={numberOfRows}
+        >
+          <Option value={3}>3</Option>
+          <Option value={5}>5</Option>
+        </Select>
 
-      <Box ref={exportRef}>
-        <Stack direction={"row"}>
-          {Array.from("SHINY").map((value, index) => (
-            <BingoSquareWrapper
-              key={value}
-              bingoSquareID={`${value}-${index}`}
-              sx={{ minWidth: bingoBoard.length === 3 ? 72 : 75 }}
-            >
-              <Typography level="h1" color="primary">
-                {value}
-              </Typography>
-            </BingoSquareWrapper>
-          ))}
-        </Stack>
-        {bingoBoard.map((row, rowIndex) => (
-          <Stack key={`row-${rowIndex}`} direction={"row"}>
-            {row.map((bingoSquare, index) => (
+        <Box ref={exportRef}>
+          <Stack direction={"row"}>
+            {Array.from("SHINY").map((value, index) => (
               <BingoSquareWrapper
-                key={bingoSquare.id}
-                bingoSquareID={bingoSquare.id}
-                sx={{
-                  minWidth: getMinWidth(bingoBoard.length),
-                  backgroundColor: getBackGroundColor(bingoSquare.status),
-                }}
+                key={value}
+                bingoSquareID={`${value}-${index}`}
+                sx={{ minWidth: bingoBoard.length === 3 ? 72 : 75 }}
               >
-                {(bingoBoard.length === 3 && bingoSquare.id === "1-1") ||
-                (bingoBoard.length === 5 && bingoSquare.id === "2-2") ? (
-                  <Box sx={{ backgroundColor: "lightGreen" }}>Bonus</Box>
-                ) : bingoSquare.path ? (
-                  <Button
-                    key={`${rowIndex}-${index}-edit-button`}
-                    sx={{ border: "none", "&:hover": { borderRadius: 0 } }}
-                    color="neutral"
-                    variant="outlined"
-                    onClick={handleOnClick(bingoSquare, "edit")}
-                  >
-                    <Box>
-                      <img
-                        src={bingoSquare?.path}
-                        max-width="75px"
-                        max-height="75px"
-                      />
-                    </Box>
-                  </Button>
-                ) : (
-                  <Button
-                    key={`${rowIndex}-${index}-add-button`}
-                    sx={{ border: "none", "&:hover": { borderRadius: 0 } }}
-                    color="neutral"
-                    variant="outlined"
-                    onClick={handleOnClick(bingoSquare, "add")}
-                  >
-                    Add your Pokemon!
-                  </Button>
-                )}
+                <Typography level="h1" color="primary">
+                  {value}
+                </Typography>
               </BingoSquareWrapper>
             ))}
           </Stack>
-        ))}
-      </Box>
+          {bingoBoard.map((row, rowIndex) => (
+            <Stack key={`row-${rowIndex}`} direction={"row"}>
+              {row.map((bingoSquare, index) => (
+                <BingoSquareWrapper
+                  key={bingoSquare.id}
+                  bingoSquareID={bingoSquare.id}
+                  sx={{
+                    minWidth: getMinWidth(bingoBoard.length),
+                    backgroundColor: getBackGroundColor(bingoSquare.status),
+                  }}
+                >
+                  {(bingoBoard.length === 3 && bingoSquare.id === "1-1") ||
+                  (bingoBoard.length === 5 && bingoSquare.id === "2-2") ? (
+                    <Box sx={{ backgroundColor: "lightGreen" }}>Bonus</Box>
+                  ) : bingoSquare.path ? (
+                    <Button
+                      key={`${rowIndex}-${index}-edit-button`}
+                      sx={{ border: "none", "&:hover": { borderRadius: 0 } }}
+                      color="neutral"
+                      variant="outlined"
+                      onClick={handleOnClick(bingoSquare, "edit")}
+                    >
+                      <Box>
+                        <img
+                          src={bingoSquare?.path}
+                          max-width="75px"
+                          max-height="75px"
+                        />
+                      </Box>
+                    </Button>
+                  ) : (
+                    <Button
+                      key={`${rowIndex}-${index}-add-button`}
+                      sx={{ border: "none", "&:hover": { borderRadius: 0 } }}
+                      color="neutral"
+                      variant="outlined"
+                      onClick={handleOnClick(bingoSquare, "add")}
+                    >
+                      Add your Pokemon!
+                    </Button>
+                  )}
+                </BingoSquareWrapper>
+              ))}
+            </Stack>
+          ))}
+        </Box>
 
-      <Stack direction={"row"} spacing={2}>
-        <Button
-          color="danger"
-          variant="outlined"
-          size={"lg"}
-          onClick={handleReset}
-        >
-          Reset
-        </Button>
-        <Dropdown>
-          <MenuButton size={"lg"}>Export as...</MenuButton>
-          <Menu>
-            <MenuItem onClick={handleExport("png")}>PNG</MenuItem>
-            <MenuItem onClick={handleExport("jpg")}>JPG</MenuItem>
-          </Menu>
-        </Dropdown>
+        <Stack direction={"row"} spacing={2}>
+          <Button
+            color="danger"
+            variant="outlined"
+            size={"lg"}
+            onClick={handleReset}
+          >
+            Reset
+          </Button>
+          <Dropdown>
+            <MenuButton size={"lg"}>Export as...</MenuButton>
+            <Menu>
+              <MenuItem onClick={handleExport("png")}>PNG</MenuItem>
+              <MenuItem onClick={handleExport("jpg")}>JPG</MenuItem>
+            </Menu>
+          </Dropdown>
+        </Stack>
+        <AddPokemonModal
+          square={selectedSquare}
+          open={openAddModal}
+          setOpen={setOpenAddModal}
+          addPokemon={handlePokemon}
+          listOfPokemon={query.data?.results}
+        />
+        <EditPokemonModal
+          square={selectedSquare}
+          open={openEditModal}
+          setOpen={setOpenEditModal}
+          setAddOpen={setOpenAddModal}
+          editStatus={handlePokemon}
+        />
       </Stack>
-      <AddPokemonModal
-        square={selectedSquare}
-        open={openAddModal}
-        setOpen={setOpenAddModal}
-        addPokemon={handlePokemon}
-        listOfPokemon={query.data?.results}
-      />
-      <EditPokemonModal
-        square={selectedSquare}
-        open={openEditModal}
-        setOpen={setOpenEditModal}
-        setAddOpen={setOpenAddModal}
-        editStatus={handlePokemon}
-      />
     </Stack>
   );
 }
